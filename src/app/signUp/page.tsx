@@ -2,6 +2,14 @@
 
 import { useState, useTransition } from "react";
 import { useSignUp } from "../store/userStore";
+import {
+  TextField,
+  Button,
+  Typography,
+  Box,
+  CircularProgress,
+  Paper,
+} from "@mui/material";
 
 type SignUpPageProps = {
   formAction: (formData: FormData) => Promise<{
@@ -27,82 +35,92 @@ export default function SignUpForm({ formAction }: SignUpPageProps) {
     startTransition(async () => {
       const result = await formAction(formData);
       if (result?.errors) {
-        setFormErrors(result.errors); // Store field-specific errors locally
-        setError("Sign-up failed"); // Optional: Set a general error in Zustand
+        setFormErrors(result.errors);
+        setError("Sign-up failed");
       } else {
-        setFormErrors(null); // Clear local errors
-        setError(""); // Clear store error on success (server redirect handles navigation)
+        setFormErrors(null);
+        setError("");
       }
     });
   };
+
   console.log(useSignUp());
 
   return (
-    <form action={handleSubmit} className="space-y-4">
-      {/* Username Field */}
-      <div>
-        <label htmlFor="username" className="block">
-          Username
-        </label>
-        <input
+    <Paper elevation={3} sx={{ maxWidth: 400, mx: "auto", p: 3, mt: 5 }}>
+      <Box
+        component="form"
+        action={handleSubmit}
+        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+      >
+        <Typography variant="h5" component="h1" gutterBottom align="center">
+          Sign Up
+        </Typography>
+
+        {/* Username Field */}
+        <TextField
           id="username"
           name="username"
+          label="Username"
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="border p-2 w-full"
           disabled={isPending}
+          error={!!formErrors?.username}
+          helperText={formErrors?.username?.[0]}
+          variant="outlined"
+          fullWidth
         />
-        {formErrors?.username && (
-          <p className="text-red-500 text-sm">{formErrors.username[0]}</p>
-        )}
-      </div>
 
-      {/* Email Field */}
-      <div>
-        <label htmlFor="email" className="block">
-          Email
-        </label>
-        <input
+        {/* Email Field */}
+        <TextField
           id="email"
           name="email"
+          label="Email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="border p-2 w-full"
           disabled={isPending}
+          error={!!formErrors?.email}
+          helperText={formErrors?.email?.[0]}
+          variant="outlined"
+          fullWidth
         />
-        {formErrors?.email && (
-          <p className="text-red-500 text-sm">{formErrors.email[0]}</p>
-        )}
-      </div>
 
-      {/* Password Field */}
-      <div>
-        <label htmlFor="password" className="block">
-          Password
-        </label>
-        <input
+        {/* Password Field */}
+        <TextField
           id="password"
           name="password"
+          label="Password"
           type="password"
-          className="border p-2 w-full"
           disabled={isPending}
+          error={!!formErrors?.password}
+          helperText={formErrors?.password?.[0]}
+          variant="outlined"
+          fullWidth
         />
-        {formErrors?.password && (
-          <p className="text-red-500 text-sm">{formErrors.password[0]}</p>
-        )}
-      </div>
 
-      {/* Submit Button */}
-      <button
-        type="submit"
-        className="bg-blue-500 text-white p-2 rounded"
-        disabled={isPending}
-      >
-        {isPending ? "Signing Up..." : "Sign Up"}
-      </button>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-    </form>
+        {/* Submit Button */}
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={isPending}
+          fullWidth
+          startIcon={
+            isPending ? <CircularProgress size={20} color="inherit" /> : null
+          }
+        >
+          {isPending ? "Signing Up..." : "Sign Up"}
+        </Button>
+
+        {/* General Error */}
+        {error && (
+          <Typography color="error" variant="body2" align="center">
+            {error}
+          </Typography>
+        )}
+      </Box>
+    </Paper>
   );
 }
