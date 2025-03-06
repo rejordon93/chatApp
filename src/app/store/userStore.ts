@@ -4,10 +4,12 @@ import { signUpAction } from "@/app/actions/signUpAction"; // Adjust path
 export interface SignUpState {
   username: string;
   email: string;
+  isActive: boolean;
   status: "success" | "error";
   error: string | null;
   setUsername: (username: string) => void;
   setEmail: (email: string) => void;
+  setIsActive: (isActive: boolean) => void;
   setError: (error: string) => void;
   signUp: (formData?: FormData) => Promise<void>;
 }
@@ -15,10 +17,12 @@ export interface SignUpState {
 export const useSignUp = create<SignUpState>((set) => ({
   username: "",
   email: "",
+  isActive: false,
   status: "success",
   error: null,
   setUsername: (username) => set({ username }),
   setEmail: (email) => set({ email }),
+  setIsActive: (isActive) => set({ isActive }),
   setError: (error) => set({ error }),
   signUp: async (formData) => {
     set({ status: "success", error: null });
