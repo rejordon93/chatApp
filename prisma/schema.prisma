@@ -14,4 +14,17 @@ model User {
   password  String
   isActive  Boolean   @default(false)
   createdAt DateTime  @default(now())
+  profile Profile?
+}
+
+model Profile {
+  id     Int  @id @default(autoincrement())
+  username String
+  email String
+  state String
+  city String
+  country String
+  bio String
+  user User @relation(fields: [userid], references: [id])
+  userid Int @unique
 }

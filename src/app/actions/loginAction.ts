@@ -2,7 +2,6 @@
 import prisma from "../database/prisma";
 import { z } from "zod";
 import jwt from "jsonwebtoken";
-import { redirect } from "next/navigation";
 import bcryptjs from "bcryptjs";
 import { cookies } from "next/headers";
 
@@ -36,13 +35,30 @@ export async function loginAction(formData: FormData) {
     return { errors: { password: ["Invalid Password"] } };
   }
 
+  await prisma.user.update({
+    where: {
+      email,
+    },
+    data: {
+      isActive: true,
+    },
+  });
+
   const tokenData = {
     id: user.id,
+    email: user.email,
   };
 
   const token = await jwt.sign(tokenData, process.env.TOKEN_SECRET!, {
     expiresIn: "1d",
   });
+
+  const res = {
+    message: "Login successful",
+    token: token,
+    username: user.username,
+    email: user.email,
+  };
 
   (await cookies()).set("token", token, {
     httpOnly: true,
@@ -50,5 +66,5 @@ export async function loginAction(formData: FormData) {
     path: "/",
   });
 
-  redirect("/chatHomePage");
+  return { success: true, res };
 }
